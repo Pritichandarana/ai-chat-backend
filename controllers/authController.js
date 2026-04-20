@@ -143,3 +143,14 @@ export const resetPassword = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+export const refreshTokenController = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    const data = await refreshTokenService(refreshToken);
+
+    res.json(data);
+  } catch (err) {
+    res.status(401).json({ error: err.message });
+  }
+};
