@@ -18,10 +18,16 @@ if (!JWT_SECRET) {
   throw new Error("JWT_SECRET missing in authController ❌");
 }
 
+// const cookieOptions = {
+//   httpOnly: true,
+//   secure: false,
+//   sameSite: "lax",
+//   path: "/",
+// };
 const cookieOptions = {
   httpOnly: true,
-  secure: false,
-  sameSite: "lax",
+  secure: true, // ✅ REQUIRED for production
+  sameSite: "none", // ✅ REQUIRED for cross-domain
   path: "/",
 };
 
@@ -53,8 +59,17 @@ export const login = async (req, res) => {
       ...cookieOptions,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
+    const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
 
-    res.json({ message: "Login successful" });
+    // ✅ THIS IS THE IMPORTANT PART
+    res.json({
+      message: "Login successful",
+      user: {
+        userId: decoded.userId,
+        name: decoded.name,
+        email: decoded.email,
+      },
+    });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }

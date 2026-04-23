@@ -11,22 +11,35 @@ import chatRoutes from "./routes/chatRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 
 const app = express();
+
 app.use(express.json());
+// app.use(
+//   cors({
+//     origin: ["http://localhost:5173", "https://ai-chat-ui-five-pi.vercel.app"],
+//     credentials: true,
+//   }),
+// );
+
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://ai-chat-ui-five-pi.vercel.app"],
+    origin: "https://ai-chat-ui-five-pi.vercel.app",
     credentials: true,
   }),
 );
-
-// app.use(express.json());
 app.use(cookieParser());
 
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB connected"))
-  .catch((err) => console.error("❌ MongoDB error:", err));
+// ✅ CONNECT DB FIRST
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("✅ MongoDB connected");
+  } catch (err) {
+    console.error("❌ MongoDB error:", err);
+    process.exit(1);
+  }
+};
 
+// ROUTES
 app.use("/api", authRoutes);
 app.use("/api/chats", chatRoutes);
 app.use("/api", uploadRoutes);
@@ -37,6 +50,9 @@ app.get("/", (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+// ✅ START SERVER ONLY AFTER DB CONNECTS
+connectDB().then(() => {
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  });
 });
