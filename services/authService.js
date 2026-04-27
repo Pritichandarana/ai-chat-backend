@@ -101,6 +101,9 @@ export const refreshTokenService = async (refreshToken) => {
 //
 // ✅ FORGOT PASSWORD
 //
+//
+// ✅ FORGOT PASSWORD
+//
 export const forgotPasswordService = async ({ email }) => {
   const user = await User.findOne({ email });
   if (!user) throw new Error("User not found");
@@ -109,10 +112,10 @@ export const forgotPasswordService = async ({ email }) => {
 
   user.resetToken = token;
   user.resetTokenExpiry = Date.now() + 15 * 60 * 1000; // 15 min
-
   await user.save();
 
-  const resetLink = `http://localhost:5173/reset-password/${token}`;
+  // 🔥 FIX: use ENV instead of localhost
+  const resetLink = `${process.env.CLIENT_URL}/reset-password/${token}`;
 
   await sendEmail(email, resetLink);
 
