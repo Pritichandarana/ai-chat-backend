@@ -22,7 +22,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: "https://ai-chat-ui-five-pi.vercel.app",
+    origin: ["http://localhost:5173", "https://ai-chat-ui-five-pi.vercel.app"],
     credentials: true,
   }),
 );
